@@ -14,7 +14,8 @@ Socket programming in Python
 
 import socket    # Basic TCP/IP communication on the internet
 import random    # To pick a port at random, giving us some chance to pick a port not in use
-import _thread   # Response computation runs concurrently with main program 
+import _thread   # Response computation runs concurrently with main program
+
 
 
 def listen(portnum):
@@ -51,10 +52,12 @@ def serve(sock, func):
         _thread.start_new_thread(func, (clientsocket,))
 
 
-CAT = """
-     ^ ^
-   =(   )=
-   """
+pageError = '''
+<b>404 PAGE ERROR:</b><br><br><br>
+The file you are looking for does not exist in 
+the directory that <i>pageserve_skel.py</i> resides in<br><br>
+Please try searching for a different file
+'''
 
 
 def respond(sock):
@@ -69,8 +72,17 @@ def respond(sock):
 
     parts = request.split()
     if len(parts) > 1 and parts[0] == "GET":
+
+        #get html file request from user
+        filename = parts[1]
+        filename = filename[1:]
+        try:
+          pagetoserve = open(filename, "r").read()
+        except FileNotFoundError:
+          pagetoserve = pageError
+
         transmit("HTTP/1.0 200 OK\n\n", sock)
-        transmit(CAT, sock)
+        transmit(pagetoserve, sock)
     else:
         transmit("\nI don't handle this request: {}\n".format(request), sock)
 
@@ -84,7 +96,9 @@ def transmit(msg, sock):
     while sent < len(msg):
         buff = bytes( msg[sent: ], encoding="utf-8")
         sent += sock.send( buff )
-    
+
+
+
 
 def main():
     port = random.randint(5000,8000)
@@ -92,6 +106,8 @@ def main():
     print("Listening on port {}".format(port))
     print("Socket is {}".format(sock))
     serve(sock, respond)
+
+
 
 main()
     

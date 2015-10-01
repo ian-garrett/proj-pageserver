@@ -57,7 +57,7 @@ def sendcat(sock):
     Send a cat picture on socket sock
     """
     sent = 0
-    msg = CAT
+    msg = open("trivia.html")
     request = sock.recv(1024)
     print("Request was {}".format(request))
     while sent < len(msg):
