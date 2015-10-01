@@ -71,11 +71,12 @@ def respond(sock):
     print("\nRequest was {}\n".format(request))
 
     parts = request.split()
-    if len(parts) > 1 and parts[0] == "GET":
+    if len(parts) > 1 and parts[0] == "GET" and (parts[1].endswith(".html") or parts[1].endswith(".css")):
 
         #get html file request from user
-        filename = parts[1]
-        filename = filename[1:]
+        filename = parts[1].lstrip("/")
+        #404 error page
+        pageError = '<b>404 PAGE ERROR:</b><br><br><br>The file <u>' + filename + '</u> does not exist in the directory that <i>pageserve_skel.py</i> resides in<br><br>Please try searching for a different file'             
         try:
           pagetoserve = open(filename, "r").read()
         except FileNotFoundError:
